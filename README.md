@@ -93,8 +93,8 @@ event-manager/
 ### Installation Steps
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
-   cd event-manager
+   git clone https://github.com/okwareddevnest/Event-Manager-S-Hook-Hackathon.git
+   cd Event-Manager-S-Hook-Hackathon
    ```
 
 2. Install dependencies:
