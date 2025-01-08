@@ -24,3 +24,6 @@ pids
 # OS files
 .DS_Store
 Thumbs.db 
+
+public/uploads/*
+!public/uploads/.gitkeep 
