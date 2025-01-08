@@ -3,10 +3,223 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event Manager - Your Events Hub</title>
+    <title>EventHub - Your Events Hub</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/css/style.css">
     <style>
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color), #357ABD);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            animation: fadeInUp 1.2s ease;
+        }
+
+        .hero-button {
+            padding: 1rem 2rem;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .primary-button {
+            background: white;
+            color: var(--primary-color);
+        }
+
+        .secondary-button {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid white;
+        }
+
+        .hero-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-container {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: -3rem auto 3rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 3rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 30px;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            box-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
+            outline: none;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 3rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        .featured-section {
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .featured-section h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+            text-align: center;
+        }
+
+        .featured-section p {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+        }
+
+        .event-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .event-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .event-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .event-content {
+            padding: 1.5rem;
+        }
+
+        .event-category {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .event-title {
+            font-size: 1.4rem;
+            margin: 0 0 1rem;
+            color: var(--text-color);
+        }
+
+        .event-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.8rem;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .event-info i {
+            color: var(--primary-color);
+            width: 20px;
+        }
+
+        .event-price {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-top: 1rem;
+        }
+
+        .event-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+            margin-top: 1rem;
+        }
+
+        .attendees-info {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .featured-badge {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: var(--accent-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            z-index: 1;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -14,39 +227,28 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1001;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            overflow-y: auto;
         }
 
         .modal-content {
-            position: relative;
-            background-color: white;
-            margin: 15% auto;
+            background: white;
+            margin: 5% auto;
             padding: 2rem;
-            width: 80%;
-            max-width: 600px;
-            border-radius: 10px;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateY(-100px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+            width: 90%;
+            max-width: 800px;
+            border-radius: 15px;
+            position: relative;
         }
 
         .close-modal {
             position: absolute;
-            right: 1rem;
             top: 1rem;
+            right: 1rem;
             font-size: 1.5rem;
             cursor: pointer;
-            color: var(--text-color);
+            color: var(--text-secondary);
             transition: color 0.3s;
         }
 
@@ -54,34 +256,43 @@
             color: var(--accent-color);
         }
 
-        .event-card {
-            cursor: pointer;
-            transition: all 0.3s ease;
+        .modal-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
         }
 
-        .event-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        }
-
-        .modal-event-title {
+        .modal-title {
             font-size: 2rem;
-            color: var(--secondary-color);
             margin-bottom: 1rem;
+            color: var(--text-color);
         }
 
-        .modal-event-date {
+        .modal-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-info-item {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            color: var(--primary-color);
-            margin-bottom: 1rem;
+            color: var(--text-secondary);
         }
 
-        .modal-event-description {
-            line-height: 1.8;
-            color: var(--text-color);
-            margin-bottom: 2rem;
+        .modal-info-item i {
+            color: var(--primary-color);
+            width: 20px;
         }
 
         .modal-actions {
@@ -92,41 +303,47 @@
 
         .modal-button {
             padding: 0.8rem 1.5rem;
-            border-radius: 5px;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
             transition: all 0.3s;
+            border: none;
+        }
+
+        .edit-button {
+            background: var(--primary-color);
             color: white;
         }
 
-        .edit-btn {
-            background-color: var(--primary-color);
-        }
-
-        .delete-btn {
-            background-color: var(--accent-color);
+        .delete-button {
+            background: var(--accent-color);
+            color: white;
         }
 
         .modal-button:hover {
+            opacity: 0.9;
             transform: translateY(-2px);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
-        .no-events {
-            text-align: center;
-            padding: 2rem;
-            color: var(--text-color);
-            background: white;
-            border-radius: 10px;
-            margin-top: 2rem;
-        }
+        @media (max-width: 768px) {
+            .events-grid {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
 
-        .no-events i {
-            font-size: 3rem;
-            color: var(--primary-color);
-            margin-bottom: 1rem;
+            .modal-content {
+                margin: 2% auto;
+                width: 95%;
+                padding: 1rem;
+            }
+
+            .modal-image {
+                height: 200px;
+            }
+
+            .modal-title {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
@@ -139,40 +356,40 @@
         </div>
     </nav>
 
-    <header class="hero">
-        <div class="hero-content">
-            <h1 class="animate-fade-in">Welcome to EventHub</h1>
-            <p class="animate-fade-in-delay">Manage your events with style</p>
-            <a href="/add-event" class="cta-button animate-fade-in-delay-2">Create New Event</a>
+    <section class="hero">
+        <h1>Discover Amazing Events</h1>
+        <p>Find and create events that bring people together</p>
+        <div class="hero-buttons">
+            <a href="/add-event" class="hero-button primary-button">
+                <i class="fas fa-plus"></i> Create Event
+            </a>
+            <a href="#events" class="hero-button secondary-button">
+                <i class="fas fa-search"></i> Browse Events
+            </a>
         </div>
-    </header>
+    </section>
 
-    <main class="container">
-        <section class="events-section">
+    <div class="container">
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="searchInput" class="search-input" 
+                   placeholder="Search events by title, category, or location...">
+        </div>
+
+        <section class="featured-section" id="events">
             <h2>Upcoming Events</h2>
-            <div class="events-grid" id="eventsContainer">
-                <!-- Events will be populated here dynamically -->
+            <p>Discover and join exciting events in your area</p>
+            <div id="eventsGrid" class="events-grid">
+                <!-- Events will be populated here -->
             </div>
         </section>
-    </main>
+    </div>
 
-    <!-- Modal for event details -->
     <div id="eventModal" class="modal">
         <div class="modal-content">
-            <span class="close-modal" onclick="closeModal()">&times;</span>
-            <h2 class="modal-event-title" id="modalTitle"></h2>
-            <div class="modal-event-date">
-                <i class="fas fa-calendar"></i>
-                <span id="modalDate"></span>
-            </div>
-            <div class="modal-event-description" id="modalDescription"></div>
-            <div class="modal-actions">
-                <a href="#" class="modal-button edit-btn" id="modalEditBtn">
-                    <i class="fas fa-edit"></i> Edit Event
-                </a>
-                <a href="#" class="modal-button delete-btn" id="modalDeleteBtn">
-                    <i class="fas fa-trash"></i> Delete Event
-                </a>
+            <span class="close-modal">&times;</span>
+            <div id="modalContent">
+                <!-- Modal content will be populated here -->
             </div>
         </div>
     </div>
@@ -183,124 +400,207 @@
 
     <script>
         // Fetch and display events
-        fetch('/api/events')
-            .then(response => response.json())
-            .then(events => {
-                const container = document.getElementById('eventsContainer');
-                if (events.length === 0) {
-                    container.innerHTML = `
-                        <div class="no-events">
-                            <i class="fas fa-calendar-times"></i>
-                            <h3>No Events Found</h3>
-                            <p>Start by creating your first event!</p>
-                        </div>
-                    `;
-                    return;
-                }
-                events.forEach(event => {
-                    const eventCard = createEventCard(event);
-                    container.appendChild(eventCard);
-                });
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                const container = document.getElementById('eventsContainer');
-                container.innerHTML = `
-                    <div class="no-events">
-                        <i class="fas fa-exclamation-circle"></i>
-                        <h3>Error Loading Events</h3>
-                        <p>Please try again later.</p>
-                    </div>
-                `;
-            });
+        function fetchEvents(searchQuery = '') {
+            fetch(`/api/events${searchQuery ? `?search=${searchQuery}` : ''}`)
+                .then(response => response.json())
+                .then(events => {
+                    const eventsGrid = document.getElementById('eventsGrid');
+                    eventsGrid.innerHTML = '';
 
+                    events.forEach(event => {
+                        const card = createEventCard(event);
+                        eventsGrid.appendChild(card);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Create event card
         function createEventCard(event) {
             const card = document.createElement('div');
             card.className = 'event-card animate-fade-in';
             
-            const date = new Date(event.event_date);
-            
-            card.innerHTML = `
-                <div class="event-date">
-                    <span class="day">${date.getDate()}</span>
-                    <span class="month">${date.toLocaleString('default', { month: 'short' })}</span>
-                </div>
-                <h3>${event.title}</h3>
-                <p>${event.description ? event.description.substring(0, 100) + '...' : 'No description provided.'}</p>
-            `;
-            
-            // Add click event to show modal
-            card.addEventListener('click', () => showEventDetails(event));
-            
-            return card;
-        }
-
-        function showEventDetails(event) {
-            const modal = document.getElementById('eventModal');
-            const date = new Date(event.event_date);
-            const formattedDate = date.toLocaleDateString('en-US', {
+            const formattedDate = new Date(event.event_date).toLocaleDateString('en-US', {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'
             });
 
-            document.getElementById('modalTitle').textContent = event.title;
-            document.getElementById('modalDate').textContent = formattedDate;
-            document.getElementById('modalDescription').textContent = event.description || 'No description provided.';
-            document.getElementById('modalEditBtn').href = `/edit-event?id=${event.id}`;
+            const formattedTime = event.event_time.slice(0, 5);
+            const formattedPrice = parseFloat(event.ticket_price).toLocaleString('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            });
+
+            card.innerHTML = `
+                ${event.is_featured ? '<div class="featured-badge"><i class="fas fa-star"></i> Featured</div>' : ''}
+                <div class="event-category" style="background: ${getCategoryColor(event.category)}">
+                    ${event.category}
+                </div>
+                <img src="${event.image_url || '/images/default-event.jpg'}" 
+                     alt="${event.title}" class="event-image">
+                <div class="event-content">
+                    <h3 class="event-title">${event.title}</h3>
+                    <div class="event-info">
+                        <i class="fas fa-calendar"></i>
+                        <span>${formattedDate}</span>
+                    </div>
+                    <div class="event-info">
+                        <i class="fas fa-clock"></i>
+                        <span>${formattedTime}</span>
+                    </div>
+                    <div class="event-info">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>${event.location}</span>
+                    </div>
+                    <div class="event-price">${formattedPrice}</div>
+                    <div class="event-footer">
+                        <div class="attendees-info">
+                            ${event.current_attendees}/${event.max_attendees} spots filled
+                        </div>
+                        <div class="event-info">
+                            <i class="fas fa-user"></i>
+                            <span>${event.organizer_name}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            card.addEventListener('click', () => showEventModal(event));
+            return card;
+        }
+
+        // Show event modal
+        function showEventModal(event) {
+            const modal = document.getElementById('eventModal');
+            const modalContent = document.getElementById('modalContent');
             
-            // Setup delete button
-            const deleteBtn = document.getElementById('modalDeleteBtn');
-            deleteBtn.onclick = (e) => {
-                e.preventDefault();
-                if (confirm('Are you sure you want to delete this event?')) {
-                    deleteEvent(event.id);
-                }
-            };
+            const formattedDate = new Date(event.event_date).toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            const formattedTime = event.event_time.slice(0, 5);
+            const formattedPrice = parseFloat(event.ticket_price).toLocaleString('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            });
+
+            modalContent.innerHTML = `
+                <img src="${event.image_url || '/images/default-event.jpg'}" 
+                     alt="${event.title}" class="modal-image">
+                <h2 class="modal-title">${event.title}</h2>
+                <p class="modal-description">${event.description}</p>
+                <div class="modal-info">
+                    <div class="modal-info-item">
+                        <i class="fas fa-calendar"></i>
+                        <span>${formattedDate}</span>
+                    </div>
+                    <div class="modal-info-item">
+                        <i class="fas fa-clock"></i>
+                        <span>${formattedTime}</span>
+                    </div>
+                    <div class="modal-info-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>${event.location}</span>
+                    </div>
+                    <div class="modal-info-item">
+                        <i class="fas fa-ticket-alt"></i>
+                        <span>${formattedPrice}</span>
+                    </div>
+                    <div class="modal-info-item">
+                        <i class="fas fa-users"></i>
+                        <span>${event.current_attendees}/${event.max_attendees} spots filled</span>
+                    </div>
+                    <div class="modal-info-item">
+                        <i class="fas fa-user"></i>
+                        <span>${event.organizer_name}</span>
+                    </div>
+                    <div class="modal-info-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>${event.organizer_email}</span>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="modal-button edit-button" onclick="window.location.href='/edit-event/${event.id}'">
+                        <i class="fas fa-edit"></i> Edit Event
+                    </button>
+                    <button class="modal-button delete-button" onclick="deleteEvent(${event.id})">
+                        <i class="fas fa-trash"></i> Delete Event
+                    </button>
+                </div>
+            `;
 
             modal.style.display = 'block';
-            document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
         }
 
-        function closeModal() {
-            const modal = document.getElementById('eventModal');
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto'; // Restore scrolling
-        }
-
+        // Delete event
         function deleteEvent(eventId) {
-            fetch(`/api/events/${eventId}`, {
-                method: 'DELETE'
-            })
-            .then(response => {
-                if (response.ok) {
-                    closeModal();
-                    window.location.reload();
-                } else {
-                    alert('Error deleting event');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error deleting event');
-            });
+            if (confirm('Are you sure you want to delete this event?')) {
+                fetch(`/api/events/${eventId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('eventModal').style.display = 'none';
+                        fetchEvents();
+                    } else {
+                        alert('Error deleting event');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
         }
+
+        // Get category color
+        function getCategoryColor(category) {
+            const colors = {
+                'Conference': '#4A90E2',
+                'Workshop': '#50E3C2',
+                'Seminar': '#F5A623',
+                'Networking': '#7ED321',
+                'Social': '#D0021B',
+                'Concert': '#9013FE',
+                'Exhibition': '#4A4A4A',
+                'Sports': '#F8E71C'
+            };
+            return colors[category] || '#4A4A4A';
+        }
+
+        // Close modal
+        document.querySelector('.close-modal').addEventListener('click', () => {
+            document.getElementById('eventModal').style.display = 'none';
+        });
 
         // Close modal when clicking outside
-        window.onclick = function(event) {
+        window.addEventListener('click', (e) => {
             const modal = document.getElementById('eventModal');
-            if (event.target === modal) {
-                closeModal();
-            }
-        }
-
-        // Close modal on escape key
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                closeModal();
+            if (e.target === modal) {
+                modal.style.display = 'none';
             }
         });
+
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        let searchTimeout;
+
+        searchInput.addEventListener('keyup', (e) => {
+            clearTimeout(searchTimeout);
+            if (e.key === 'Enter') {
+                fetchEvents(searchInput.value.trim());
+            } else {
+                searchTimeout = setTimeout(() => {
+                    fetchEvents(searchInput.value.trim());
+                }, 500);
+            }
+        });
+
+        // Initial load
+        fetchEvents();
     </script>
 </body>
 </html>

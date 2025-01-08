@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add New Event - EventHub</title>
+    <title>Edit Event - EventHub</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/css/style.css">
     <style>
@@ -168,6 +168,30 @@
             margin-top: 0.3rem;
             display: none;
         }
+
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -175,13 +199,13 @@
         <div class="nav-brand">EventHub</div>
         <div class="nav-links">
             <a href="/">Home</a>
-            <a href="/add-event" class="active">Add Event</a>
+            <a href="/add-event">Add Event</a>
         </div>
     </nav>
 
     <div class="container">
         <div class="form-container animate-fade-in">
-            <h2><i class="fas fa-calendar-plus"></i> Create New Event</h2>
+            <h2><i class="fas fa-edit"></i> Edit Event</h2>
             
             <form id="eventForm" class="animate-fade-in">
                 <div class="image-preview" id="imagePreview">
@@ -283,10 +307,14 @@
                 </div>
 
                 <button type="submit" class="submit-button animate-fade-in-delay-2">
-                    <i class="fas fa-plus"></i> Create Event
+                    <i class="fas fa-save"></i> Save Changes
                 </button>
             </form>
         </div>
+    </div>
+
+    <div id="loading" class="loading" style="display: none;">
+        <i class="fas fa-spinner"></i>
     </div>
 
     <footer class="footer">
@@ -294,6 +322,44 @@
     </footer>
 
     <script>
+        const eventId = window.location.pathname.split('/').pop();
+        const loading = document.getElementById('loading');
+
+        // Fetch event data
+        loading.style.display = 'flex';
+        fetch(`/api/events/${eventId}`)
+            .then(response => response.json())
+            .then(event => {
+                document.getElementById('title').value = event.title;
+                document.getElementById('description').value = event.description;
+                document.getElementById('event_date').value = event.event_date.split('T')[0];
+                document.getElementById('event_time').value = event.event_time.slice(0, 5);
+                document.getElementById('location').value = event.location;
+                document.getElementById('max_attendees').value = event.max_attendees;
+                document.getElementById('ticket_price').value = event.ticket_price;
+                document.getElementById('organizer_name').value = event.organizer_name;
+                document.getElementById('organizer_email').value = event.organizer_email;
+                document.getElementById('is_featured').checked = event.is_featured;
+                document.getElementById('category').value = event.category;
+
+                if (event.image_url) {
+                    document.getElementById('imagePreview').innerHTML = `
+                        <img src="${event.image_url}" alt="Event image">
+                        <div class="remove-image" id="removeImage">
+                            <i class="fas fa-times"></i>
+                        </div>
+                    `;
+                    document.getElementById('imageUrl').value = event.image_url;
+                }
+
+                loading.style.display = 'none';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                loading.style.display = 'none';
+                alert('Error loading event data');
+            });
+
         // Fetch categories and populate the category select
         fetch('/api/categories')
             .then(response => response.json())
@@ -310,6 +376,9 @@
                         option.classList.add('selected');
                         document.getElementById('category').value = category.name;
                     };
+                    if (category.name === document.getElementById('category').value) {
+                        option.classList.add('selected');
+                    }
                     categorySelect.appendChild(option);
                 });
             })
@@ -346,13 +415,6 @@
             if (file) {
                 handleImageUpload(file);
             }
-        });
-
-        removeImage.addEventListener('click', (e) => {
-            e.stopPropagation();
-            imagePreview.innerHTML = '<i class="fas fa-image"></i><div class="remove-image" id="removeImage"><i class="fas fa-times"></i></div>';
-            imageUrl.value = '';
-            imageUpload.value = '';
         });
 
         function handleImageUpload(file) {
@@ -417,12 +479,13 @@
             }
 
             if (isValid) {
+                loading.style.display = 'flex';
                 const formData = new FormData(this);
                 const data = {};
                 formData.forEach((value, key) => data[key] = value);
 
-                fetch('/add-event', {
-                    method: 'POST',
+                fetch(`/api/events/${eventId}`, {
+                    method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -430,18 +493,17 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.error) {
-                        throw new Error(data.error);
-                    }
+                    loading.style.display = 'none';
                     if (data.success) {
                         window.location.href = '/';
                     } else {
-                        throw new Error('Failed to create event');
+                        alert('Error updating event');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert(error.message || 'Error creating event');
+                    loading.style.display = 'none';
+                    alert('Error updating event');
                 });
             }
         });
@@ -452,4 +514,4 @@
         dateInput.setAttribute('min', today);
     </script>
 </body>
-</html>
+</html> 
