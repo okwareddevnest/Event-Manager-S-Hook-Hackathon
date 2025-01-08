@@ -107,15 +107,14 @@ event-manager/
    mysql -u root -p < db.sql
    ```
 
-4. Configure database connection in `server.js`:
-   ```javascript
-   const db = mysql.createConnection({
-       host: 'localhost',
-       user: 'your_username',
-       password: 'your_password',
-       database: 'event_manager_db'
-   });
+4. Configure environment variables:
+   ```env
+   DB_HOST=localhost
+   DB_USER=your_username
+   DB_PASSWORD=your_password
+   DB_NAME=event_manager_db
    ```
+   Create a `.env` file in the root directory and add the above configuration.
 
 5. Start the server:
    ```bash
