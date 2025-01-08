@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Manager - Your Events Hub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: white;
+            margin: 15% auto;
+            padding: 2rem;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 10px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+            transition: color 0.3s;
+        }
+
+        .close-modal:hover {
+            color: var(--accent-color);
+        }
+
+        .event-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .event-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-event-title {
+            font-size: 2rem;
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        .modal-event-date {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .modal-event-description {
+            line-height: 1.8;
+            color: var(--text-color);
+            margin-bottom: 2rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .modal-button {
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        .edit-btn {
+            background-color: var(--primary-color);
+        }
+
+        .delete-btn {
+            background-color: var(--accent-color);
+        }
+
+        .modal-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .no-events {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-color);
+            background: white;
+            border-radius: 10px;
+            margin-top: 2rem;
+        }
+
+        .no-events i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">EventHub</div>
+        <div class="nav-links">
+            <a href="/" class="active">Home</a>
+            <a href="/add-event">Add Event</a>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content">
+            <h1 class="animate-fade-in">Welcome to EventHub</h1>
+            <p class="animate-fade-in-delay">Manage your events with style</p>
+            <a href="/add-event" class="cta-button animate-fade-in-delay-2">Create New Event</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="events-section">
+            <h2>Upcoming Events</h2>
+            <div class="events-grid" id="eventsContainer">
+                <!-- Events will be populated here dynamically -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal for event details -->
+    <div id="eventModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2 class="modal-event-title" id="modalTitle"></h2>
+            <div class="modal-event-date">
+                <i class="fas fa-calendar"></i>
+                <span id="modalDate"></span>
+            </div>
+            <div class="modal-event-description" id="modalDescription"></div>
+            <div class="modal-actions">
+                <a href="#" class="modal-button edit-btn" id="modalEditBtn">
+                    <i class="fas fa-edit"></i> Edit Event
+                </a>
+                <a href="#" class="modal-button delete-btn" id="modalDeleteBtn">
+                    <i class="fas fa-trash"></i> Delete Event
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 EventHub. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Fetch and display events
+        fetch('/api/events')
+            .then(response => response.json())
+            .then(events => {
+                const container = document.getElementById('eventsContainer');
+                if (events.length === 0) {
+                    container.innerHTML = `
+                        <div class="no-events">
+                            <i class="fas fa-calendar-times"></i>
+                            <h3>No Events Found</h3>
+                            <p>Start by creating your first event!</p>
+                        </div>
+                    `;
+                    return;
+                }
+                events.forEach(event => {
+                    const eventCard = createEventCard(event);
+                    container.appendChild(eventCard);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const container = document.getElementById('eventsContainer');
+                container.innerHTML = `
+                    <div class="no-events">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h3>Error Loading Events</h3>
+                        <p>Please try again later.</p>
+                    </div>
+                `;
+            });
+
+        function createEventCard(event) {
+            const card = document.createElement('div');
+            card.className = 'event-card animate-fade-in';
+            
+            const date = new Date(event.event_date);
+            
+            card.innerHTML = `
+                <div class="event-date">
+                    <span class="day">${date.getDate()}</span>
+                    <span class="month">${date.toLocaleString('default', { month: 'short' })}</span>
+                </div>
+                <h3>${event.title}</h3>
+                <p>${event.description ? event.description.substring(0, 100) + '...' : 'No description provided.'}</p>
+            `;
+            
+            // Add click event to show modal
+            card.addEventListener('click', () => showEventDetails(event));
+            
+            return card;
+        }
+
+        function showEventDetails(event) {
+            const modal = document.getElementById('eventModal');
+            const date = new Date(event.event_date);
+            const formattedDate = date.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            document.getElementById('modalTitle').textContent = event.title;
+            document.getElementById('modalDate').textContent = formattedDate;
+            document.getElementById('modalDescription').textContent = event.description || 'No description provided.';
+            document.getElementById('modalEditBtn').href = `/edit-event?id=${event.id}`;
+            
+            // Setup delete button
+            const deleteBtn = document.getElementById('modalDeleteBtn');
+            deleteBtn.onclick = (e) => {
+                e.preventDefault();
+                if (confirm('Are you sure you want to delete this event?')) {
+                    deleteEvent(event.id);
+                }
+            };
+
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('eventModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto'; // Restore scrolling
+        }
+
+        function deleteEvent(eventId) {
+            fetch(`/api/events/${eventId}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.ok) {
+                    closeModal();
+                    window.location.reload();
+                } else {
+                    alert('Error deleting event');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error deleting event');
+            });
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('eventModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Close modal on escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

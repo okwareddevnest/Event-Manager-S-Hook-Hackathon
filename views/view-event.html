@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Details - EventHub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .event-details {
+            max-width: 800px;
+            margin: 80px auto 0;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .event-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--background-color);
+        }
+
+        .event-title {
+            font-size: 2rem;
+            color: var(--secondary-color);
+        }
+
+        .event-meta {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            color: var(--text-color);
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .event-description {
+            line-height: 1.8;
+            color: var(--text-color);
+            margin-bottom: 2rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .action-button {
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all var(--transition-speed);
+        }
+
+        .edit-button {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .delete-button {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .loading i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">EventHub</div>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/add-event">Add Event</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="event-details animate-fade-in">
+            <div id="loading" class="loading">
+                <i class="fas fa-spinner"></i>
+                <p>Loading event details...</p>
+            </div>
+
+            <div id="eventContent" style="display: none;">
+                <div class="event-header">
+                    <h1 class="event-title" id="eventTitle"></h1>
+                    <div class="event-date" id="eventDate"></div>
+                </div>
+
+                <div class="event-meta">
+                    <div class="meta-item">
+                        <i class="fas fa-calendar"></i>
+                        <span id="formattedDate"></span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-clock"></i>
+                        <span id="daysUntil"></span>
+                    </div>
+                </div>
+
+                <div class="event-description" id="eventDescription"></div>
+
+                <div class="action-buttons">
+                    <a href="#" class="action-button edit-button" id="editButton">
+                        <i class="fas fa-edit"></i> Edit Event
+                    </a>
+                    <a href="#" class="action-button delete-button" id="deleteButton">
+                        <i class="fas fa-trash"></i> Delete Event
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 EventHub. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Get event ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventId = urlParams.get('id');
+
+        // Fetch event details
+        fetch(`/api/events/${eventId}`)
+            .then(response => response.json())
+            .then(event => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('eventContent').style.display = 'block';
+
+                // Populate event details
+                document.getElementById('eventTitle').textContent = event.title;
+                document.getElementById('eventDescription').textContent = event.description;
+
+                // Format and display dates
+                const eventDate = new Date(event.event_date);
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                document.getElementById('formattedDate').textContent = eventDate.toLocaleDateString('en-US', options);
+
+                // Calculate and display days until event
+                const today = new Date();
+                const diffTime = Math.abs(eventDate - today);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                const daysText = eventDate > today ? 
+                    `${diffDays} days until event` : 
+                    `Event occurred ${diffDays} days ago`;
+                document.getElementById('daysUntil').textContent = daysText;
+
+                // Set up action buttons
+                document.getElementById('editButton').href = `/edit-event?id=${eventId}`;
+                
+                // Handle delete button
+                document.getElementById('deleteButton').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (confirm('Are you sure you want to delete this event?')) {
+                        fetch(`/api/events/${eventId}`, {
+                            method: 'DELETE'
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                window.location.href = '/';
+                            } else {
+                                alert('Error deleting event');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Error deleting event');
+                        });
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('loading').innerHTML = `
+                    <i class="fas fa-exclamation-circle" style="color: var(--accent-color)"></i>
+                    <p>Error loading event details</p>
+                `;
+            });
+    </script>
+</body>
+</html>
+

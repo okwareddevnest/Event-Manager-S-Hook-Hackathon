@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Event - EventHub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">EventHub</div>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/add-event" class="active">Add Event</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="form-container animate-fade-in">
+            <h2><i class="fas fa-calendar-plus"></i> Create New Event</h2>
+            
+            <form action="/add-event" method="POST" id="eventForm">
+                <div class="form-group">
+                    <label for="title">Event Title</label>
+                    <input type="text" id="title" name="title" required 
+                           placeholder="Enter event title" class="animate-fade-in-delay">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Event Description</label>
+                    <textarea id="description" name="description" required 
+                             placeholder="Enter event description" class="animate-fade-in-delay"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="event_date">Event Date</label>
+                    <input type="date" id="event_date" name="event_date" required 
+                           class="animate-fade-in-delay">
+                </div>
+
+                <button type="submit" class="submit-button animate-fade-in-delay-2">
+                    <i class="fas fa-plus"></i> Create Event
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 EventHub. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Form validation and enhancement
+        document.getElementById('eventForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('title').value.trim();
+            const description = document.getElementById('description').value.trim();
+            const eventDate = document.getElementById('event_date').value;
+
+            if (title.length < 3) {
+                alert('Event title must be at least 3 characters long');
+                return;
+            }
+
+            if (description.length < 10) {
+                alert('Please provide a more detailed description (at least 10 characters)');
+                return;
+            }
+
+            const selectedDate = new Date(eventDate);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (selectedDate < today) {
+                alert('Please select a future date for the event');
+                return;
+            }
+
+            // If all validation passes, submit the form
+            this.submit();
+        });
+
+        // Set minimum date to today
+        const dateInput = document.getElementById('event_date');
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.setAttribute('min', today);
+    </script>
+</body>
+</html>
